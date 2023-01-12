@@ -6,9 +6,9 @@ TODO:
 '''
 
 # Libs
-import utm
-import shapely.geometry
-import matplotlib.pyplot as plt
+import utm # pip install utm
+import shapely.geometry # pip install shapely
+import matplotlib.pyplot as plt #pip install matplotlib
 
 from math import sqrt, pow
 
@@ -21,10 +21,15 @@ BRAVO = utm.from_latlon(48.5060947,-71.6317518)
 QUEBEC =  utm.from_latlon(48.5262308,-71.6345802)
 ZULU = utm.from_latlon(48.4932846,-71.6664874)
 
+# A sample bounded area
 bound = [ALPHA,VICTOR,NOVEMBER,OSCAR]
 
-def djikstra(start, end, bound):
+def restriction(start, end, bound):
+    '''
+    :type start, end: tuples(x,y) coordintes in UTM
+    '''
 
+    # Represents the bounded area
     bounded = polygon(bound)
 
     boundedScaled = bounded.buffer(15,join_style=2)
@@ -80,7 +85,7 @@ def intersect(start, end, boundedArea):
     start,end : tuple of (x,y) values
     boundedArea
     '''
-
+    
     line = shapely.geometry.LineString([ (start[0],start[1]),(end[0],end[1]) ])
 
     return line.intersects(boundedArea)
@@ -93,6 +98,14 @@ def distance(Point1,Point2):
     return sqrt( pow(Point1[0]-Point2[0],2) + pow(Point1[1]-Point2[1],2) )
 
 def polygon(lst):
+    '''
+    returns a shapely polygon given a list of coordinates
+    
+    Current assumptions:
+    list of points must be ordered to generate convex shape
+    the polygon is composed of 4 points
+
+    '''
     return shapely.geometry.Polygon([
         [lst[0][0],lst[0][1]],
         [lst[1][0],lst[1][1]],
@@ -101,11 +114,10 @@ def polygon(lst):
     ])
 
 # Random code for testing
-lst = djikstra(BRAVO,QUEBEC,bound)
+lst = restriction(BRAVO,QUEBEC,bound)
 
 x,y = polygon(bound).exterior.xy
 plt.plot(x,y)
-
 for i in lst:
     plt.plot(i[0],i[1],'bo',linestyle="--")
 
